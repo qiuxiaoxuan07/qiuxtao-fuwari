@@ -1,24 +1,24 @@
 ---
-import MainGridLayout from "../layouts/MainGridLayout.astro";
-import { siteConfig } from "../config";
-import FriendList from "../components/FriendList.svelte";
 import { Icon } from "astro-icon/components";
+import FriendList from "../components/FriendList.svelte";
+import { siteConfig } from "../config";
+import MainGridLayout from "../layouts/MainGridLayout.astro";
 
 // 1. 定义友链数据
 const friends = [
-  {
-    title: "薄荷の小屋",
-    url: "https://www.hoshiroko.com",
-    avatar: "https://api.hoshiroko.com/img/avatar.jpg",
-    description: "越是拼命往前伸手，渴望之物越是渐行渐远"
-  },
-  {
-    title: "夏沫花火zzz",
-    url: "https://1l1.icu",
-    avatar: "https://blog.1l1.icu/images/avatar.jpg",
-    description: "Keep doing,keep loving."
-  },
-  // 在这里继续添加更多好友...
+	{
+		title: "薄荷の小屋",
+		url: "https://www.hoshiroko.com",
+		avatar: "https://api.hoshiroko.com/img/avatar.jpg",
+		description: "越是拼命往前伸手，渴望之物越是渐行渐远",
+	},
+	{
+		title: "夏沫花火zzz",
+		url: "https://1l1.icu",
+		avatar: "https://blog.1l1.icu/images/avatar.jpg",
+		description: "Keep doing,keep loving.",
+	},
+	// 在这里继续添加更多好友...
 ];
 ---
 

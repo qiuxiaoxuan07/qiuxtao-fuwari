@@ -7,11 +7,27 @@ import ImageWrapper from "../misc/ImageWrapper.astro";
 const config = profileConfig;
 
 const siteLinks = [
-    { name: '神秘小盘', url: 'https://pan.qiuxiaotao.com/', icon: 'fa6-solid:cloud' },
-    { name: '监控站', url: 'https://status.qiuxiaotao.com/', icon: 'fa6-solid:server' },
-    { name: 'MC地图', url: 'https://mcmap.qiuxiaotao.com/', icon: 'fa6-solid:map' },
-    { name: 'NextChat', url: 'https://chat.qiuxiaotao.com/', icon: 'fa6-solid:robot' },
-]
+	{
+		name: "神秘小盘",
+		url: "https://pan.qiuxiaotao.com/",
+		icon: "fa6-solid:cloud",
+	},
+	{
+		name: "监控站",
+		url: "https://status.qiuxiaotao.com/",
+		icon: "fa6-solid:server",
+	},
+	{
+		name: "MC地图",
+		url: "https://mcmap.qiuxiaotao.com/",
+		icon: "fa6-solid:map",
+	},
+	{
+		name: "NextChat",
+		url: "https://chat.qiuxiaotao.com/",
+		icon: "fa6-solid:robot",
+	},
+];
 ---
 <div class="card-base p-3">
     <a aria-label="Go to About Page" href={url('/about/')}

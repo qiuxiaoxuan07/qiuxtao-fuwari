@@ -3,7 +3,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-import 'overlayscrollbars/overlayscrollbars.css';
+import "overlayscrollbars/overlayscrollbars.css";
 
 import ConfigCarrier from "@components/ConfigCarrier.astro";
 import { profileConfig, siteConfig } from "@/config";
@@ -51,7 +51,7 @@ const enableBanner = siteConfig.banner.enable;
 
 // 核心修复：服务端直接判断是否启用背景
 // 并将此状态传递给 HTML class，彻底杜绝闪烁
-const enableBg = siteConfig.background && siteConfig.background.enable;
+const enableBg = siteConfig.background?.enable;
 
 let pageTitle: string;
 if (title) {

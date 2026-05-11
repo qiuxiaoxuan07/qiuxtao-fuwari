@@ -1,20 +1,20 @@
 <script lang="ts">
-import Icon from "@iconify/svelte";
-import { 
-    getDefaultHue, 
-    getHue, 
-    setHue,
-    getBgBlur,
-    setBgBlur,
-    getHideBg,
-    setHideBg,
-    getStoredTheme,
-    setTheme
-} from "@utils/setting-utils";
 import { AUTO_MODE, DARK_MODE, LIGHT_MODE } from "@constants/constants";
+import Icon from "@iconify/svelte";
+import {
+	getBgBlur,
+	getDefaultHue,
+	getHideBg,
+	getHue,
+	getStoredTheme,
+	setBgBlur,
+	setHideBg,
+	setHue,
+	setTheme,
+} from "@utils/setting-utils";
 
 let hue = getHue();
-let bgBlur = getBgBlur(); 
+let bgBlur = getBgBlur();
 let hideBg = getHideBg();
 let theme = getStoredTheme();
 
@@ -29,17 +29,17 @@ $: if (hue || hue === 0) {
 }
 
 $: {
-    setBgBlur(bgBlur);
+	setBgBlur(bgBlur);
 }
 
 function toggleHideBg() {
-    hideBg = !hideBg;
-    setHideBg(hideBg);
+	hideBg = !hideBg;
+	setHideBg(hideBg);
 }
 
 function switchTheme(newTheme: string) {
-    theme = newTheme;
-    setTheme(newTheme);
+	theme = newTheme;
+	setTheme(newTheme);
 }
 </script>
 

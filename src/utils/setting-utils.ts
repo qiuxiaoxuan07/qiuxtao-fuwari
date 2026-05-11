@@ -1,21 +1,21 @@
-import { expressiveCodeConfig } from "@/config";
-import type { LIGHT_DARK_MODE } from "@/types/config";
 import {
 	AUTO_MODE,
 	DARK_MODE,
 	DEFAULT_THEME,
 	LIGHT_MODE,
 } from "@constants/constants.ts";
+import { expressiveCodeConfig } from "@/config";
+import type { LIGHT_DARK_MODE } from "@/types/config";
 
 export function getDefaultHue(): number {
 	const fallback = "250";
 	const configCarrier = document.getElementById("config-carrier");
-	return Number.parseInt(configCarrier?.dataset.hue || fallback);
+	return Number.parseInt(configCarrier?.dataset.hue || fallback, 10);
 }
 
 export function getHue(): number {
 	const stored = localStorage.getItem("hue");
-	return stored ? Number.parseInt(stored) : getDefaultHue();
+	return stored ? Number.parseInt(stored, 10) : getDefaultHue();
 }
 
 export function setHue(hue: number, save = true): void {
@@ -27,7 +27,7 @@ export function setHue(hue: number, save = true): void {
 
 export function getBgBlur(): number {
 	const stored = localStorage.getItem("bg-blur");
-	return stored ? Number.parseInt(stored) : 4; // Default blur is 4
+	return stored ? Number.parseInt(stored, 10) : 4; // Default blur is 4
 }
 
 export function setBgBlur(blur: number): void {
@@ -66,7 +66,7 @@ export function applyThemeToDocument(theme: LIGHT_DARK_MODE) {
 			}
 			break;
 	}
-	if (expressiveCodeConfig && expressiveCodeConfig.theme) {
+	if (expressiveCodeConfig?.theme) {
 		document.documentElement.setAttribute(
 			"data-theme",
 			expressiveCodeConfig.theme,

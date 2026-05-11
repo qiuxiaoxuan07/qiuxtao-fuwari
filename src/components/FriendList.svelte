@@ -1,31 +1,33 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+import { onMount } from "svelte";
 
-  // 定义传入的数据类型
-  export let friends: {
-    title: string;
-    url: string;
-    avatar: string;
-    description: string;
-  }[] = [];
+type Friend = {
+	title: string;
+	url: string;
+	avatar: string;
+	description: string;
+};
 
-  // 用于显示的列表，初始时直接使用原顺序（防止服务端渲染时空白）
-  let displayFriends = friends;
+// 定义传入的数据类型
+export let friends: Friend[] = [];
 
-  // 随机打乱函数
-  function shuffleArray(array: any[]) {
-    const newArray = [...array];
-    for (let i = newArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-    }
-    return newArray;
-  }
+// 用于显示的列表，初始时直接使用原顺序（防止服务端渲染时空白）
+let displayFriends = friends;
 
-  // 组件挂载后（在浏览器端运行）执行打乱
-  onMount(() => {
-    displayFriends = shuffleArray(friends);
-  });
+// 随机打乱函数
+function shuffleArray<T>(array: T[]) {
+	const newArray = [...array];
+	for (let i = newArray.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+	}
+	return newArray;
+}
+
+// 组件挂载后（在浏览器端运行）执行打乱
+onMount(() => {
+	displayFriends = shuffleArray(friends);
+});
 </script>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
