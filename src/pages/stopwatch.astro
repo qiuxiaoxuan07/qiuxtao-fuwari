@@ -1,0 +1,341 @@
+---
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+import { Icon } from "astro-icon/components";
+
+const title = "在线秒表";
+const description = "在线秒表，支持计次与留档的计时工具";
+---
+
+<MainGridLayout title={title} description={description}>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" slot="head">
+    
+    <div class="card-base z-10 px-6 py-6 md:px-8 relative w-full text-neutral-900 dark:text-neutral-100 tool-wrapper flex flex-col gap-6" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;">
+        
+        <div class="w-full flex items-center gap-3 pb-2 mb-2 font-bold text-2xl">
+            <Icon name="material-symbols:timer-outline" class="text-3xl text-[var(--primary)]" />
+            {title}
+        </div>
+
+        <div class="w-full px-2">
+            <p class="text-[0.95rem] text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed max-w-2xl">
+                一个简单的在线秒表，支持计次和保存历史记录。
+            </p>
+        </div>
+
+        <div class="relative z-10 w-full flex flex-col md:flex-row gap-6 md:gap-8 rounded-[1.8rem]">
+            
+            <!-- Left Side: Main Timer & Lap List -->
+            <div class="flex-[1.2] flex flex-col items-center border border-black/10 dark:border-white/10 rounded-2xl p-6 bg-black/[0.02] dark:bg-white/[0.02]">
+                
+                <div class="w-full flex items-center justify-between xl:px-4">
+                    <div class="text-neutral-400 dark:text-neutral-500 uppercase tracking-widest text-xs font-bold flex items-center gap-2">
+                        <Icon name="material-symbols:timer-outline" class="text-lg" />
+                        计时器
+                    </div>
+                </div>
+
+                <!-- Timer Core - System Sans Serif tracking tight -->
+                <div class="my-8 md:my-12 w-full flex justify-center items-center">
+                    <div id="sw-timer" class="font-bold tabular-nums flex items-baseline justify-center tracking-tighter" style="font-size: clamp(4rem, 9vw, 6.5rem); line-height: 1;">
+                        00:00.00
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="w-full max-w-[22rem] grid grid-cols-2 gap-3 mb-8">
+                    <button id="btn-start" onclick="toggleTimer()" class="group relative overflow-hidden bg-[var(--primary)] text-white font-bold text-[1.1rem] py-3.5 rounded-xl transition-all hover:brightness-110 active:scale-95 shadow-sm flex items-center justify-center gap-1.5 focus:outline-none">
+                        <Icon name="material-symbols:play-arrow-rounded" class="text-2xl" id="btn-start-icon" />
+                        <span id="btn-start-text">启动</span>
+                    </button>
+                    <button id="btn-lap" onclick="recordLap()" class="bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-neutral-700 dark:text-neutral-200 font-bold text-[1.1rem] py-3.5 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 focus:outline-none">
+                        <Icon name="material-symbols:flag-rounded" class="text-xl opacity-70" />
+                        记次
+                    </button>
+                    <button id="btn-reset" onclick="resetTimer()" class="bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-red-500 font-bold text-[1.1rem] py-3.5 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 focus:outline-none">
+                        <Icon name="material-symbols:refresh-rounded" class="text-xl" />
+                        重置
+                    </button>
+                    <button id="btn-save" onclick="saveArchive()" class="bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-blue-500 font-bold text-[1.1rem] py-3.5 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 focus:outline-none">
+                        <Icon name="material-symbols:save-rounded" class="text-xl" />
+                        保存
+                    </button>
+                    <div class="col-span-2 text-center mt-3 mb-1">
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 text-neutral-400 text-xs font-semibold">
+                            <kbd class="px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10">空格</kbd> 启停 
+                            <span class="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-600"></span>
+                            <kbd class="px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10">L</kbd> 记次 
+                            <span class="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-600"></span>
+                            <kbd class="px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10">S</kbd> 留档
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Laps Layout -->
+                <div class="w-full flex-1 flex flex-col min-h-[160px]">
+                    <div class="flex justify-between items-center pb-2 border-b border-black/10 dark:border-white/10 text-neutral-400 dark:text-neutral-500 text-xs font-bold uppercase tracking-wider px-2">
+                        <span>计次 (Laps)</span>
+                        <span>记录时间</span>
+                    </div>
+                    <!-- Overflow area -->
+                    <div id="lap-table" class="flex-1 overflow-y-auto w-full custom-scrollbar pr-3 mt-2 space-y-1 h-[200px]">
+                        <!-- Filled via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Archives -->
+            <div class="flex-[0.8] flex flex-col border border-black/10 dark:border-white/10 rounded-2xl p-6 bg-black/[0.02] dark:bg-white/[0.02] h-[500px] md:h-auto overflow-hidden">
+                <div class="flex justify-between items-center pb-3 border-b border-black/10 dark:border-white/10 shrink-0 px-1">
+                    <div class="text-neutral-600 dark:text-neutral-300 font-bold text-sm tracking-wide flex items-center gap-2">
+                        <Icon name="material-symbols:history-rounded" class="text-xl text-[var(--primary)]" />
+                        历史记录
+                    </div>
+                    <button onclick="clearArchives()" class="text-xs text-neutral-500 hover:text-red-500 font-bold px-3 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-red-500/10 transition-colors flex items-center gap-1 focus:outline-none">
+                        <Icon name="material-symbols:delete-outline-rounded" class="text-sm" />
+                        清空
+                    </button>
+                </div>
+                
+                <!-- Archive List -->
+                <div id="archive-table" class="flex-1 overflow-y-auto w-full custom-scrollbar pr-2 mt-4 space-y-3">
+                    <div class="w-full h-full flex flex-col gap-2 items-center justify-center text-neutral-400 text-sm font-medium opacity-60" id="archive-empty-state">
+                        <Icon name="material-symbols:contract-edit-outline-rounded" class="text-4xl opacity-50 mb-2"/>
+                        点击“保存”按钮记录当前时间...
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <style>
+        /* Custom scrollbar optimized to blend into light/dark generic background */
+        .custom-scrollbar::-webkit-scrollbar { 
+            width: 5px; 
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb { 
+            background: rgba(128,128,128,0.2); 
+            border-radius: 999px; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { 
+            background: rgba(128,128,128,0.4); 
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-in {
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+
+    <script is:inline>
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timerInterval;
+        let isRunning = false;
+        
+        let lapCounter = 0;
+        let archiveCounter = 0;
+        let lastArchiveTime = null;
+
+        let timerDisplay, startBtnText, startBtnIcon, startBtn, lapTable, archiveTable, emptyState;
+
+        function initStopwatch() {
+            timerDisplay = document.getElementById('sw-timer');
+            startBtnText = document.getElementById('btn-start-text');
+            startBtnIcon = document.getElementById('btn-start-icon');
+            startBtn = document.getElementById('btn-start');
+            lapTable = document.getElementById('lap-table');
+            archiveTable = document.getElementById('archive-table');
+            emptyState = document.getElementById('archive-empty-state');
+            
+            // Resume if re-evaluating script while timer is paused locally
+            if (timerDisplay && !isRunning) {
+                updateDisplay();
+            }
+        }
+
+        // Output formats (MM:SS.ms)
+        function formatTime(ms) {
+            let minutes = Math.floor(ms / 60000);
+            let seconds = Math.floor((ms % 60000) / 1000);
+            let milliseconds = Math.floor((ms % 1000) / 10);
+            return (
+                (minutes < 10 ? "0" : "") + minutes + ":" +
+                (seconds < 10 ? "0" : "") + seconds + "." +
+                (milliseconds < 10 ? "0" : "") + milliseconds
+            );
+        }
+
+        function updateDisplay() {
+            if (!timerDisplay) return;
+            const now = Date.now();
+            const time = elapsedTime + (isRunning ? (now - startTime) : 0);
+            timerDisplay.innerHTML = formatTime(time);
+        }
+
+        function toggleTimer() {
+            if (!timerDisplay) return;
+            if (isRunning) {
+                // Pause
+                clearInterval(timerInterval);
+                elapsedTime += Date.now() - startTime;
+                isRunning = false;
+                
+                // Switch UI to Resumed state (Orange)
+                startBtnText.textContent = "继续";
+                startBtnIcon.setAttribute('name', 'material-symbols:play-arrow-rounded');
+                startBtn.className = "group relative overflow-hidden bg-orange-500 text-white font-bold text-[1.1rem] py-3.5 rounded-[1rem] transition-all hover:opacity-90 active:scale-95 shadow-md flex items-center justify-center gap-1.5 focus:outline-none";
+                
+                timerDisplay.style.opacity = "0.6";
+            } else {
+                // Start
+                startTime = Date.now();
+                timerInterval = setInterval(updateDisplay, 10);
+                isRunning = true;
+                
+                // Switch UI to Pause state (Red)
+                startBtnText.textContent = "暂停";
+                startBtnIcon.setAttribute('name', 'material-symbols:pause-rounded');
+                startBtn.className = "group relative overflow-hidden bg-red-500 text-white font-bold text-[1.1rem] py-3.5 rounded-[1rem] transition-all hover:opacity-90 active:scale-95 shadow-md flex items-center justify-center gap-1.5 focus:outline-none";
+                
+                timerDisplay.style.opacity = "1";
+            }
+            if (document.activeElement) document.activeElement.blur();
+        }
+
+        function recordLap() {
+            if (!lapTable) return;
+            if (!isRunning && elapsedTime === 0) return;
+            let currentTime = isRunning ? elapsedTime + (Date.now() - startTime) : elapsedTime;
+            lapCounter++;
+            
+            const row = document.createElement('div');
+            row.className = "flex justify-between items-center py-2.5 px-2 border-b border-black/5 dark:border-white/5 text-[1.05rem] animate-slide-in";
+            // Prepend a 0 to single digits for aesthetic alignment
+            const counterDisplay = lapCounter < 10 ? `0${lapCounter}` : lapCounter;
+            
+            row.innerHTML = `
+                <div class="text-neutral-500 dark:text-neutral-400 font-semibold tracking-wide flex items-center gap-2">
+                    <span class="text-neutral-400 dark:text-neutral-500 text-sm leading-none pt-0.5">#</span>${counterDisplay}
+                </div>
+                <div class="font-bold tracking-tighter tabular-nums">${formatTime(currentTime)}</div>
+            `;
+            lapTable.insertBefore(row, lapTable.firstChild);
+        }
+
+        function saveArchive() {
+            if (!archiveTable) return;
+            let currentTime = isRunning ? elapsedTime + (Date.now() - startTime) : elapsedTime;
+            if (currentTime === 0) return;
+            archiveCounter++;
+            
+            if (emptyState) emptyState.style.display = 'none';
+
+            let diffHtml = '<span class="px-2 py-0.5 rounded bg-black/5 dark:bg-white/10 text-neutral-500 font-mono text-xs font-bold shadow-sm">基准线</span>';
+            if (lastArchiveTime !== null) {
+                let diff = currentTime - lastArchiveTime;
+                let diffSign = diff > 0 ? "+" : "-";
+                // Color codes
+                let diffBadgeBg = diff > 0 ? "bg-red-500/10 dark:bg-red-500/20" : "bg-green-500/10 dark:bg-green-500/20";
+                let diffText = diff > 0 ? "text-red-500 dark:text-red-400" : "text-green-600 dark:text-green-400";
+                
+                let absDiff = Math.abs(diff / 1000).toFixed(2);
+                diffHtml = `<span class="px-2 py-0.5 rounded-md ${diffBadgeBg} ${diffText} font-mono text-xs font-bold leading-tight tracking-tight shadow-sm">${diffSign}${absDiff}s</span>`;
+            }
+            lastArchiveTime = currentTime;
+
+            const row = document.createElement('div');
+            row.className = "bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-[1.2rem] p-4 flex flex-col gap-1.5 animate-slide-in shadow-sm";
+            
+            row.innerHTML = `
+                <div class="flex justify-between items-start w-full">
+                    <div class="text-[0.65rem] font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-widest mb-1.5">
+                        记录项 - ${archiveCounter}
+                    </div>
+                     ${diffHtml}
+                </div>
+                <div class="w-full flex justify-between items-end">
+                    <div class="text-2xl font-bold tracking-tighter tabular-nums leading-none">
+                        ${formatTime(currentTime)}
+                    </div>
+                </div>
+            `;
+            archiveTable.insertBefore(row, archiveTable.firstChild);
+        }
+
+        function resetTimer() {
+            if (!timerDisplay) return;
+            clearInterval(timerInterval);
+            isRunning = false;
+            elapsedTime = 0;
+            lapCounter = 0;
+            
+            // Hard reset styles natively
+            startBtnText.textContent = "启动";
+            startBtnIcon.setAttribute('name', 'material-symbols:play-arrow-rounded');
+            startBtn.className = "group relative overflow-hidden bg-[var(--primary)] text-white font-bold text-[1.1rem] py-3.5 rounded-[1rem] transition-all hover:opacity-90 active:scale-95 shadow-md flex items-center justify-center gap-1.5 focus:outline-none";
+            
+            timerDisplay.innerHTML = "00:00.00";
+            timerDisplay.style.opacity = "1";
+            
+            if (lapTable) lapTable.innerHTML = "";
+            if (document.activeElement) document.activeElement.blur();
+        }
+
+        function clearArchives() {
+            if (!archiveTable) return;
+            if(confirm("确定永久清空所有的秒表记录留档吗？\n该操作不可撤销。")) {
+                archiveTable.innerHTML = "";
+                archiveCounter = 0;
+                lastArchiveTime = null;
+                if (emptyState) {
+                    emptyState.style.display = 'flex';
+                    archiveTable.appendChild(emptyState);
+                }
+            }
+        }
+
+        // Global keyboard listener setup exactly once
+        if (!window.stopwatchPremiumKeybindsSet) {
+            document.addEventListener('keydown', function(event) {
+                if (!document.getElementById('sw-timer')) return;
+                
+                if (event.code === 'Space') { 
+                    if (event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA') {
+                        event.preventDefault(); 
+                        document.getElementById('btn-start').classList.add('scale-95');
+                        setTimeout(() => document.getElementById('btn-start').classList.remove('scale-95'), 100);
+                        toggleTimer(); 
+                    }
+                }
+                if (event.code === 'KeyL') {
+                    if (document.getElementById('btn-lap')) {
+                        document.getElementById('btn-lap').classList.add('scale-95');
+                        setTimeout(() => document.getElementById('btn-lap').classList.remove('scale-95'), 100);
+                    }
+                    recordLap();
+                }
+                if (event.code === 'KeyR') resetTimer();
+                if (event.code === 'KeyS') {
+                    if (document.getElementById('btn-save')) {
+                        document.getElementById('btn-save').classList.add('scale-95');
+                        setTimeout(() => document.getElementById('btn-save').classList.remove('scale-95'), 100);
+                    }
+                    saveArchive();
+                }
+            });
+            window.stopwatchPremiumKeybindsSet = true;
+        }
+
+        // Init bindings
+        initStopwatch();
+        if (typeof document !== 'undefined') {
+            document.addEventListener('astro:page-load', initStopwatch);
+            document.addEventListener('swup:contentReplaced', initStopwatch);
+        }
+    </script>
+</MainGridLayout>

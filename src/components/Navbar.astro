@@ -32,6 +32,28 @@ let links: NavBarLink[] = navBarConfig.links.map(
         </a>
         <div class="hidden md:flex">
             {links.map((l) => {
+                if (l.children && l.children.length > 0) {
+                    return (
+                        <div class="relative group">
+                            <div class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95 flex items-center cursor-pointer">
+                                {l.name}
+                            </div>
+                            <div class="absolute left-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform -translate-y-2 group-hover:translate-y-0 z-50">
+                                <div class="float-panel px-2 py-2 min-w-[150px]">
+                                    {l.children.map((child) => (
+                                        <a aria-label={child.name} href={child.external ? child.url : url(child.url)} target={child.external ? "_blank" : null}
+                                           class="btn-plain text-left rounded-lg h-10 px-4 font-bold flex items-center justify-start whitespace-nowrap active:scale-95"
+                                        >
+                                            {child.name}
+                                            {child.external && <Icon name="fa6-solid:arrow-up-right-from-square" class="text-[0.875rem] transition -translate-y-[1px] ml-1 text-black/[0.2] dark:text-white/[0.2]"></Icon>}
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
+
                 return <a aria-label={l.name} href={l.external ? l.url : url(l.url)} target={l.external ? "_blank" : null}
                           class="btn-plain scale-animation rounded-lg h-11 font-bold px-5 active:scale-95"
                 >
