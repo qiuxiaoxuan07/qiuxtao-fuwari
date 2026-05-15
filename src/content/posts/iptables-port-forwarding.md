@@ -6,7 +6,7 @@ tags:
   - iptables
   - Linux
   - 网络
-category: 笔记
+category: 教程
 draft: false
 ---
 ## 场景示例
