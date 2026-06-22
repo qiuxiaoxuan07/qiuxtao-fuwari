@@ -1,7 +1,7 @@
 ---
-
 import { getEntry, render } from "astro:content";
 import Markdown from "@components/misc/Markdown.astro";
+import { profileConfig as wifeConfig } from "../config";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import MainGridLayout from "../layouts/MainGridLayout.astro";
@@ -13,13 +13,86 @@ if (!aboutPost) {
 }
 
 const { Content } = await render(aboutPost);
+
+const husbandConfig = {
+	avatar: "https://qiuxiaoxuan.com/avatar.png",
+};
 ---
 <MainGridLayout title={i18n(I18nKey.about)} description={i18n(I18nKey.about)}>
-    <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
-        <div class="card-base z-10 px-9 py-6 relative w-full ">
-            <Markdown class="mt-2">
-                <Content />
-            </Markdown>
+    <div class="flex flex-col w-full gap-6">
+        <!-- Tab Switcher -->
+        <div class="flex justify-center onload-animation" style="animation-delay: 100ms;">
+            <div class="inline-flex items-center p-1.5 rounded-full bg-[var(--card-bg)] border border-black/5 dark:border-white/10 shadow-sm relative backdrop-blur-md">
+                <!-- Husband Tab (Link to his about page) -->
+                <a href="https://qiuxiaoxuan.com/about/" class="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium text-neutral-500 dark:text-neutral-400 transition-all duration-300" style="--tab-hover: oklch(0.70 0.14 250);" onmouseover="this.style.color='var(--tab-hover)'" onmouseout="this.style.color=''">
+                    <img src={husbandConfig.avatar} alt="秋晓轩" class="w-5 h-5 rounded-full border border-black/10 dark:border-white/10 object-cover" />
+                    秋晓轩
+                </a>
+                <!-- ECG + Heart Divider -->
+                <div class="flex items-center mx-1.5 text-rose-500 dark:text-rose-400">
+                    <svg viewBox="0 0 60 24" class="w-12 h-5" fill="none">
+                        <path d="M0 12 H12 L16 4 L20 20 L24 1 L28 23 L31 7 L34 12 H60"
+                              stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+                              pathLength="100" class="ecg-path-left" />
+                    </svg>
+                    <svg viewBox="0 0 24 24" class="w-5 h-5 -mx-0.5 ecg-heart" fill="currentColor">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <svg viewBox="0 0 60 24" class="w-12 h-5" fill="none">
+                        <path d="M0 12 H26 L29 7 L32 23 L36 1 L40 20 L44 4 L48 12 H60"
+                              stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+                              pathLength="100" class="ecg-path-right" />
+                    </svg>
+                </div>
+                <!-- Wife Tab (Active) -->
+                <div class="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold text-white shadow-md cursor-default" style="background-color: var(--primary); box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 20%, transparent);">
+                    <img src={wifeConfig.avatar} alt="秋晓桃" class="w-5 h-5 rounded-full border border-white/20 object-cover" />
+                    秋晓桃
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+            <div class="card-base z-10 px-9 py-6 relative w-full ">
+                <Markdown class="mt-2">
+                    <Content />
+                </Markdown>
+            </div>
         </div>
     </div>
 </MainGridLayout>
+
+<style is:global>
+/* ECG + Heart Divider Animations */
+.ecg-path-left {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: ecg-draw-left 2.8s infinite ease-out;
+}
+.ecg-path-right {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: ecg-draw-right 2.8s infinite ease-out;
+}
+.ecg-heart {
+    animation: heartbeat 2.8s infinite ease-in-out;
+    transform-origin: center;
+}
+
+@keyframes ecg-draw-left {
+    0% { stroke-dashoffset: 100; }
+    35%, 100% { stroke-dashoffset: 0; }
+}
+@keyframes ecg-draw-right {
+    0%, 50% { stroke-dashoffset: 100; }
+    85%, 100% { stroke-dashoffset: 0; }
+}
+@keyframes heartbeat {
+    0%, 32%, 100% { transform: scale(1); }
+    36% { transform: scale(1.3); }
+    44% { transform: scale(0.95); }
+    48% { transform: scale(1.18); }
+    56% { transform: scale(1); }
+}
+</style>
